@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmai;
+// use Illuminate\Contracts\Auth\MustVerifyEmai;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\Mahasiswa as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Foundation\Auth\Mahasiswa as Authenticatable;
+// use Illuminate\Notifications\Notifiable;
+use App\Models\Kelas;
 
 
 class Mahasiswa extends Model //Definisi model
@@ -18,9 +19,13 @@ class Mahasiswa extends Model //Definisi model
     protected $fillable = [
         'nim',
         'nama',
-        'kelas',
+        'kelas_id',
         'jurusan',
         'no_handphone',
     ];
     use HasFactory;
+
+    public function kelas(){
+        return $this->belongsTo(Kelas::class);
+    }
 }

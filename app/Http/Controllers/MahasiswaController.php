@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
+
 
 class MahasiswaController extends Controller
 {
@@ -15,10 +17,13 @@ class MahasiswaController extends Controller
     public function index()
     {
         //Fungsi eloquent menampilkan data menggunakan pagination
-        $mahasiswas = Mahasiswa::all(); //Mengambil semua isi tabel
-        $post = Mahasiswa::orderBy('Nim','desc')->paginate(6);
+        // $mahasiswas = Mahasiswa::all(); //Mengambil semua isi tabel
+
+        //yang semula mahasiswa all diubah menjadi with
+        $mahasiswas = Mahasiswa::with('kelas')->get(); //mengambil semua isi tabel
+        $mahasiswas = Mahasiswa::orderBy('Nim','desc')->paginate(6);
         return view('mahasiswas.index',compact('mahasiswas'))
-        ->with('i', (request()->input('page',1)-1)*5);
+            ->with('i', (request()->input('page',1)-1)*5);
     }
 
     /**
@@ -28,7 +33,8 @@ class MahasiswaController extends Controller
      */
     public function create()
     {
-        return view('mahasiswas.create');
+        $kelas = Kelas::all();
+        return view('mahasiswas.create', ['kelas' => $kelas]);
     }
 
     /**
@@ -48,8 +54,23 @@ class MahasiswaController extends Controller
             'no_handphone' => 'required',
         ]);
 
+        $mahasiswa = new Mahasiswa;
+        $mahasiswa->nim = $request->get('nim');
+        $mahasiswa->nama = $request->get('nama');
+        $mahasiswa->jurusan = $request->get('jurusan');
+        $mahasiswa->no_handphone = $request->get('no_handphone');
+        // $mahasiswa->save();
+
+        $kelas = new Kelas;
+        $kelas->id = $request->get('kelas');
+
+        //fungsi eloquent untuk menambah data dengan relasi belongsTo
+        $mahasiswa->kelas()->associate($kelas);
+        $mahasiswa->save();
+
         // fungsi eloquent untuk menambah data
-        Mahasiswa::create($request->all());
+        // Mahasiswa::create($request->all());
+
         // jika data berhasil ditambahkan, akan kembali ke halaman utama
         return redirect()->route('mahasiswa.index')
             ->with('success','Mahasiswa Berhasil Ditambahkan');
@@ -64,8 +85,9 @@ class MahasiswaController extends Controller
     public function show($nim)
     {
         //menampilkan detail data dengan menemukan/berdasarkan Nim Mahasiswa
-        $Mahasiswa = Mahasiswa::find($nim);
-        return view('mahasiswas.detail',compact('Mahasiswa'));
+        //code sebelum dibuat relasi --> $Mahasiswa = Mahasiswa::find($nim);
+        $Mahasiswa = Mahasiswa::with('kelas')->where('nim',$nim)->first();
+        return view('mahasiswas.detail',['Mahasiswa' => $Mahasiswa]);
     }
 
     /**
@@ -77,8 +99,10 @@ class MahasiswaController extends Controller
     public function edit($nim)
     {
          //menampilkan detail data dengan menemukan berdasarkan Nim Mahasiswa untuk diedit
-         $Mahasiswa = Mahasiswa::find($nim);
-         return view('mahasiswas.edit',compact('Mahasiswa'));
+        //  $Mahasiswa = Mahasiswa::find($nim);
+        $Mahasiswa = Mahasiswa::with('kelas')->where('nim',$nim)->first();
+        $kelas = Kelas::all();
+         return view('mahasiswas.edit',compact('Mahasiswa','kelas'));
     }
 
     /**
@@ -100,7 +124,20 @@ class MahasiswaController extends Controller
         ]);
 
         // fungsi eloquent untuk mengupdate data inputan kita
-        Mahasiswa::find($nim)->update($request->all());
+        // Mahasiswa::find($nim)->update($request->all());
+        $Mahasiswa = Mahasiswa::with('kelas')->where('nim',$nim)->first();
+        $Mahasiswa->nim = $request->get('nim');
+        $Mahasiswa->nama = $request->get('nama');
+        $Mahasiswa->jurusan = $request->get('jurusan');
+        $Mahasiswa->no_handphone = $request->get('no_handphone');
+        $Mahasiswa->save();
+
+        $kelas = new Kelas;
+        $kelas->id = $request->get('kelas');
+
+        //fungsi eloquent untuk menambah data dengan relasi belongsTo
+        $Mahasiswa->kelas()->associate($kelas);
+        $Mahasiswa->save();
 
         // jika data berhasil diupdate,akan kembali ke halaman utama
         return redirect()->route('mahasiswa.index')

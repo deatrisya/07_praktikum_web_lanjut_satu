@@ -11,9 +11,9 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><b>Nim: </b>{{$Mahasiswa->nim}}</li>
                     <li class="list-group-item"><b>Nama: </b>{{$Mahasiswa->nama}}</li>
-                    <li class="list-group-item"><b>Kelas: </b>{{$Mahasiswa->kelas}}</li>
+                    <li class="list-group-item"><b>Kelas: </b>{{$Mahasiswa->kelas->nama_kelas}}</li>
                     <li class="list-group-item"><b>Jurusan: </b>{{$Mahasiswa->jurusan}}</li>
-                    <li class="list-group-item"><b>No_Handphone: </b>{{$Mahasiswa->no_handphone}}</li>
+                    <li class="list-group-item"><b>No Handphone: </b>{{$Mahasiswa->no_handphone}}</li>
                 </ul>
             </div>
             <a class="btn btn-success mt3" href="{{route('mahasiswa.index')}}">Kembali</a>
