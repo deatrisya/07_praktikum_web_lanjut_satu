@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use App\Models\Kelas;
+use App\Models\Mahasiswa_Matakuliah;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 
@@ -14,16 +16,32 @@ class MahasiswaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //Fungsi eloquent menampilkan data menggunakan pagination
         // $mahasiswas = Mahasiswa::all(); //Mengambil semua isi tabel
 
         //yang semula mahasiswa all diubah menjadi with
-        $mahasiswas = Mahasiswa::with('kelas')->get(); //mengambil semua isi tabel
-        $mahasiswas = Mahasiswa::orderBy('Nim','desc')->paginate(6);
+        $pagination = 5;
+        $mahasiswas =Mahasiswa::with('kelas')->when($request->keyword, function($query) use ($request){
+            $query
+            ->where('nim','like',"%{$request->keyword}%")
+            ->orWhere('nama','like',"%{$request->keyword}%")
+            ->orWhere('jurusan','like',"%{$request->keyword}%")
+            ->orWhere('no_handphone','like',"%{$request->keyword}%")
+            ->orWhereHas('kelas',function (Builder $kelas) use ($request){
+                $kelas->where('nama_kelas', 'like', "%{$request->keyword}%");
+            });
+        })
+        ->orderBy('nim')
+        ->paginate($pagination);
+        //note : jika sudah menggunakan pagination tidak perlu function get().
+
+        // $mahasiswas = Mahasiswa::with('kelas')->get(); //mengambil semua isi tabel
+        // $mahasiswas = Mahasiswa::orderBy('Nim')->paginate(6);
+        $mahasiswas->appends($request->only('keyword'));
         return view('mahasiswas.index',compact('mahasiswas'))
-            ->with('i', (request()->input('page',1)-1)*5);
+            ->with('i', (request()->input('page',1)-1)*$pagination);
     }
 
     /**
@@ -156,5 +174,16 @@ class MahasiswaController extends Controller
         Mahasiswa::find($nim)->delete();
         return redirect()->route('mahasiswa.index')
             ->with('success','Mahasiswa berhasil Dihapus');
+    }
+    public function showNilai($nim)
+    {
+        // menampilkan detail data dengan menemukan/berdasarkan Nim Mahasiswa
+
+        // $Mahasiswa = Mahasiswa_Matakuliah::with('mhs_matkul')->where('mahasiswa_id',$nim)->get();
+        $Mahasiswa = Mahasiswa::where('nim',$nim)->first();
+        // $Mahasiswa = Mahasiswa::with('matakuliah')->get();
+        // dd($Mahasiswa->matakuliah);
+
+        return view('mahasiswas.detailnilai',['Mahasiswa' => $Mahasiswa]);
     }
 }
