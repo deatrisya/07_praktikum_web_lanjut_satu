@@ -8,6 +8,7 @@ use App\Models\Mahasiswa_Matakuliah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class MahasiswaController extends Controller
 {
@@ -206,5 +207,11 @@ class MahasiswaController extends Controller
         // dd($Mahasiswa->matakuliah);
 
         return view('mahasiswas.detailnilai',['Mahasiswa' => $Mahasiswa]);
+    }
+
+    public function cetak_pdf($nim){
+        $Mahasiswa = Mahasiswa::where('nim',$nim)->first();
+        $pdf = PDF::loadview('mahasiswas.cetakKHS',['Mahasiswa'=>$Mahasiswa]);
+        return $pdf->stream();
     }
 }
