@@ -175,6 +175,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        // menambah library dompdf
+        Barryvdh\DomPDF\ServiceProvider::class,
+
     ],
 
     /*
@@ -230,6 +233,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        // menambah library dompdf
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];
