@@ -7,7 +7,7 @@ use App\Models\Kelas;
 use App\Models\Mahasiswa_Matakuliah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Storage;
 
 class MahasiswaController extends Controller
 {
@@ -22,7 +22,7 @@ class MahasiswaController extends Controller
         // $mahasiswas = Mahasiswa::all(); //Mengambil semua isi tabel
 
         //yang semula mahasiswa all diubah menjadi with
-        $pagination = 5;
+        $pagination = 2;
         $mahasiswas =Mahasiswa::with('kelas')->when($request->keyword, function($query) use ($request){
             $query
             ->where('nim','like',"%{$request->keyword}%")
@@ -63,20 +63,30 @@ class MahasiswaController extends Controller
      */
     public function store(Request $request)
     {
+
         // melakukan validasi data
         $request->validate([
             'nim' => 'required',
             'nama' => 'required',
+            'foto' => 'required',
             'kelas' => 'required',
             'jurusan' => 'required',
             'no_handphone' => 'required',
         ]);
+
+
 
         $mahasiswa = new Mahasiswa;
         $mahasiswa->nim = $request->get('nim');
         $mahasiswa->nama = $request->get('nama');
         $mahasiswa->jurusan = $request->get('jurusan');
         $mahasiswa->no_handphone = $request->get('no_handphone');
+
+        if ($request->file('foto')) {
+            $image_name = $request -> file('foto')->store('images','public');
+        }
+
+        $mahasiswa->foto = $image_name;
         // $mahasiswa->save();
 
         $kelas = new Kelas;
@@ -141,6 +151,8 @@ class MahasiswaController extends Controller
             'no_handphone' => 'required',
         ]);
 
+
+
         // fungsi eloquent untuk mengupdate data inputan kita
         // Mahasiswa::find($nim)->update($request->all());
         $Mahasiswa = Mahasiswa::with('kelas')->where('nim',$nim)->first();
@@ -148,6 +160,15 @@ class MahasiswaController extends Controller
         $Mahasiswa->nama = $request->get('nama');
         $Mahasiswa->jurusan = $request->get('jurusan');
         $Mahasiswa->no_handphone = $request->get('no_handphone');
+
+        if ($request->hasFile('foto')) {
+            if ($Mahasiswa->foto && file_exists(storage_path('app/public/'.$Mahasiswa->foto))) {
+                Storage::delete('public/'.$Mahasiswa->foto);
+            }
+            $image_name = $request->file('foto')->store('images','public');
+            $Mahasiswa->foto = $image_name;
+        }
+
         $Mahasiswa->save();
 
         $kelas = new Kelas;
