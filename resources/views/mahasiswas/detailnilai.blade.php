@@ -46,7 +46,7 @@
                     @endforeach
                 </tbody>
             </table>
-
+            <a href="{{route('mahasiswa.cetakNilai',$Mahasiswa->nim)}}" class="btn btn-danger">Cetak KHS</a>
             <a class="btn btn-success mt3" href="{{route('mahasiswa.index')}}">Kembali</a>
         </div>
     </div>
