@@ -11,6 +11,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><b>Nim: </b>{{$Mahasiswa->nim}}</li>
                     <li class="list-group-item"><b>Nama: </b>{{$Mahasiswa->nama}}</li>
+                    <li class="list-group-item"><b>Foto: </b><img width= "100px" height="100px" src="{{asset('storage/'.$Mahasiswa->foto)}}" alt="foto-profil"></li>
                     <li class="list-group-item"><b>Kelas: </b>{{$Mahasiswa->kelas->nama_kelas}}</li>
                     <li class="list-group-item"><b>Jurusan: </b>{{$Mahasiswa->jurusan}}</li>
                     <li class="list-group-item"><b>No Handphone: </b>{{$Mahasiswa->no_handphone}}</li>
