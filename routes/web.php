@@ -16,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('mahasiswa', MahasiswaController::class);
 Route::get('mahasiswa/Nilai/{nim}',[MahasiswaController::class,'showNilai'])->name('mahasiswa.nilai');
+Route::get('mahasiswa/Nilai/cetak_pdf/{nim}',[MahasiswaController::class,'cetak_pdf'])->name('mahasiswa.cetakNilai');
